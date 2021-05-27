@@ -1,14 +1,16 @@
+import { hash } from "bcryptjs";
 import request from "supertest";
-import { Connection, createConnection } from "typeorm";
+import { Connection } from "typeorm";
+import { v4 as uuidV4 } from "uuid";
 
 import { app } from "../../../../app";
+import createConnection from "../../../../database";
 
 let connection: Connection;
 
-describe("Create User Controller", () => {
+describe("CreateUserController", () => {
   beforeAll(async () => {
     connection = await createConnection();
-
     await connection.runMigrations();
   });
 
@@ -18,19 +20,12 @@ describe("Create User Controller", () => {
   });
 
   it("should be able to create an user", async () => {
-    // Arrange
-    const user = {
-      name: "user name",
-      email: "user@email.com",
-      password: "123456"
-    };
+    const response = await request(app).post("/api/v1/users/").send({
+      name: "test",
+      email: "test@test.com",
+      password: "123",
+    });
 
-    // Act
-    const response = await request(app)
-      .post("/api/v1/users")
-      .send(user);
-
-    // Assert
     expect(response.status).toBe(201);
-  })
-})
+  });
+});
